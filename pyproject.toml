@@ -7,6 +7,13 @@ packages = [{ include = "nemo_text_processing" }]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<4.0"
+pynini
+regex
+tqdm
+joblib
+sacremoses
+editdistance
+cdifflib
 
 [build-system]
 requires = ["poetry-core"]
