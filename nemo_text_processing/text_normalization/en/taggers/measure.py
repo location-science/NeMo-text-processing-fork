@@ -74,7 +74,7 @@ class MeasureFst(GraphFst):
         graph_unit_plural = convert_space(graph_unit @ SINGULAR_TO_PLURAL)
         graph_unit = convert_space(graph_unit)
 
-        optional_graph_negative = pynini.closure(pynutil.insert("negative: ") + pynini.cross("-", '"true" '), 0, 1)
+        optional_graph_negative = pynini.closure(pynutil.insert("negative: ") + pynini.cross(pynini.union("-", "−"), '"true" '), 0, 1)
 
         graph_unit2 = (
             pynini.cross("/", "per") + delete_zero_or_one_space + pynutil.insert(NEMO_NON_BREAKING_SPACE) + graph_unit

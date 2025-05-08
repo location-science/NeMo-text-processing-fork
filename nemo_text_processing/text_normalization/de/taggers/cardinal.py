@@ -193,7 +193,8 @@ class CardinalFst(GraphFst):
             pynini.closure(NEMO_DIGIT, 1, 2) @ self.graph_hundred_component_at_least_one_none_zero_digit
         )
 
-        optional_minus_graph = pynini.closure(pynutil.insert("negative: ") + pynini.cross("-", "\"true\" "), 0, 1)
+        optional_minus_graph = pynini.closure(pynutil.insert("negative: ") + pynini.cross(pynini.union("-", "−"), "\"true\" "), 0, 1)
+
 
         final_graph = optional_minus_graph + pynutil.insert("integer: \"") + self.graph + pynutil.insert("\"")
         final_graph = self.add_tokens(final_graph)

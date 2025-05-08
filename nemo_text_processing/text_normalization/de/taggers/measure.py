@@ -75,7 +75,8 @@ class MeasureFst(GraphFst):
 
         graph_unit_singular = convert_space(unit_singular)
         graph_unit_plural = graph_unit_singular @ pynini.cdrewrite(convert_space(suppletive), "", "[EOS]", NEMO_SIGMA)
-        optional_graph_negative = pynini.closure("-", 0, 1)
+        optional_graph_negative = pynini.closure(pynini.union("-", "−"), 0, 1)
+
 
         graph_unit_denominator = (
             pynini.cross("/", "pro") + pynutil.insert(NEMO_NON_BREAKING_SPACE) + graph_unit_singular

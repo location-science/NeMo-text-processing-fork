@@ -60,6 +60,8 @@ class ElectronicFst(GraphFst):
         )
 
         accepted_symbols = pynini.project(pynini.string_file(get_abs_path("data/electronic/symbol.tsv")), "input")
+        trailing_punct = pynini.union(",", ".", "!", "?", ":", ";")
+        accepted_symbols_no_trailing = pynini.difference(accepted_symbols, trailing_punct)
 
         accepted_common_domains = pynini.project(
             pynini.string_file(get_abs_path("data/electronic/domain.tsv")), "input"
@@ -77,11 +79,11 @@ class ElectronicFst(GraphFst):
         dict_words_graph = dict_words_without_delimiter | dict_words
 
         all_accepted_symbols_start = (
-            dict_words_graph | pynini.closure(TO_UPPER) | pynini.closure(NEMO_UPPER) | accepted_symbols
+            dict_words_graph | pynini.closure(TO_UPPER) | pynini.closure(NEMO_UPPER) | accepted_symbols_no_trailing
         ).optimize()
 
         all_accepted_symbols_end = (
-            dict_words_graph | numbers | pynini.closure(TO_UPPER) | pynini.closure(NEMO_UPPER) | accepted_symbols
+            dict_words_graph | numbers | pynini.closure(TO_UPPER) | pynini.closure(NEMO_UPPER) | accepted_symbols_no_trailing
         ).optimize()
 
         graph_symbols = pynini.string_file(get_abs_path("data/electronic/symbol.tsv")).optimize()
@@ -128,7 +130,7 @@ class ElectronicFst(GraphFst):
         full_stop_accep = pynini.accep(".")
         dollar_accep = pynini.accep("$")  # Include for the correct transduction of the money graph
         excluded_symbols = full_stop_accep | dollar_accep
-        filtered_symbols = pynini.difference(accepted_symbols, excluded_symbols)
+        filtered_symbols = pynini.difference(accepted_symbols_no_trailing, excluded_symbols)
         accepted_characters = NEMO_ALPHA | NEMO_DIGIT | filtered_symbols
         domain_component = full_stop_accep + pynini.closure(accepted_characters, 2)
         graph_domain = (
@@ -173,6 +175,7 @@ class ElectronicFst(GraphFst):
             )
             graph |= cc_phrases
 
-        final_graph = self.add_tokens(graph)
+        token_graph = self.add_tokens(graph)
+        punct_token = pynutil.insert('tokens { name: "') + trailing_punct + pynutil.insert('" }')
+        self.fst = (token_graph | (token_graph + pynini.accep(" ") + punct_token)).optimize()
 
-        self.fst = final_graph.optimize()
